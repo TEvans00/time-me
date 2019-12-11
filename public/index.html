@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+  <title>Time Me</title>
+</head>
+
+<body>
+  <div id="app" @keydown.esc="closeLogin">
+    <div class="header">
+      <h1>Time Me</h1>
+      <div class="menu">
+        <span><a href="#">Home</a> |</span>
+        <span v-if="user"> <a href="">Stats</a> |</span>
+        <span v-if="user"> <a href="#" @click="logout">Logout</a></span>
+        <span v-else> <a href="#" @click="toggleLogin">Login</a></span>
+      </div>
+    </div>
+    <transition v-if="showLogin" name="modal">
+      <div class="modal-mask">
+        <div class="modal-wrapper">
+          <div class="modal-container">
+
+            <div class="modal-header">
+              <h1 class="modal-title">Register or Login</h1>
+            </div>
+            <div class="modal-body">
+              <p v-if="error" class="error">{{error}}</p>
+              <label>Username</label>
+              <br>
+              <input v-model="username">
+              <br>
+              <label>Password</label>
+              <br>
+              <input type="password" v-model="password">
+            </div>
+            <div class="modal-footer">
+              <button @click="register" type="button">Register</button>
+              <button @click="login" type="button" class="other">Login</button>
+              <button @click="toggleForm" type="button" class="close">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+    <div class="content">
+      <p>Welcome<span v-if="user">, {{user.username}}</span>!</p>
+      <form @submit.prevent="addProject">
+        <input v-model="addedTitle" placeholder="Project Title"></p>
+        <textarea v-model="addedDescription"></textarea>
+        <br />
+        <button type="submit">Submit</button>
+      </form>
+
+      <h3>Projects</h3>
+      <div v-for="project in projects">
+        <hr>
+        <div class="project">
+          <h2>{{project.title}}</h2>
+          <p>{{project.descript}}</p>
+        </div>
+        <button @click="toggleProject(project)"><span v-if="project.started">Stop</span><span v-else>Start</span></button>
+        <span v-if="project.started">{{timeDiff}}</span>
+        <br>
+        <span class="delete">
+          <button @click="deleteProject(project)" class="delete">Delete</button>
+        </span>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js" integrity="sha256-mpnrJ5DpEZZkwkE1ZgkEQQJW/46CSEh/STrZKOB/qoM=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.7/vue.js" integrity="sha256-g+Q8DFAmG5+eyRPSydX0LY4TfjsL11XSDrIGerbbEdA=" crossorigin="anonymous"></script>
+  <script src="/script.js"></script>
+</body>
+
+</html>
