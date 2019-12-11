@@ -10,7 +10,10 @@ const auth = require("./auth.js");
 const projectSchema = new mongoose.Schema({
   title: String,
   descript: String,
-  time: Number,
+  total: Number,
+  hours: Number,
+  minutes: Number,
+  seconds: Number,
   started: Boolean,
   currStart: Number,
 });
@@ -41,11 +44,14 @@ router.get('/:id', async(req, res) => {
   }
 });
 
-router.post('/', async(req, res) => {
+router.post('/', auth.verifyToken, async(req, res) => {
   const project = new Project({
     title: req.body.title,
     descript: req.body.descript,
-    time: 0,
+    total: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
     started: false,
     currStart: 0,
   });
@@ -59,18 +65,24 @@ router.post('/', async(req, res) => {
   }
 });
 
-router.put('/stop/:id', async(req, res) => {
+router.put('/stop/:id', auth.verifyToken, async(req, res) => {
   try {
     let id = req.params.id;
 
     Project.findOne({ "_id": id }, function(err, project) {
-      let oldTime = project.time;
-      let timeToAdd = req.body.t - project.currStart;
-      console.log(oldTime);
+      let oldTime = project.total;
+      console.log(project.total);
+      let timeToAdd = Math.round((req.body.t - project.currStart) / 1000);
       console.log(req.body.t);
       console.log(project.currStart);
       console.log(timeToAdd);
-      project.time = timeToAdd;
+      project.total = oldTime + timeToAdd;
+      project.seconds = project.total % 60;
+      project.minutes = ((project.total - project.seconds) % 3600) / 60;
+      project.hours = ((project.total - (project.seconds + (project.minutes * 60))) % 216000) / 3600;
+      console.log(project.seconds);
+      console.log(project.minutes);
+      console.log(project.hours);
       project.started = false;
       project.save();
       return res.send(project);
@@ -82,7 +94,7 @@ router.put('/stop/:id', async(req, res) => {
   }
 });
 
-router.put('/start/:id', async(req, res) => {
+router.put('/start/:id', auth.verifyToken, async(req, res) => {
   try {
     let id = req.params.id;
     Project.findOne({ "_id": id }, function(err, project) {
