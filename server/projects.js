@@ -67,6 +67,8 @@ router.put('/stop/:id', async(req, res) => {
       let oldTime = project.time;
       let timeToAdd = req.body.t - project.currStart;
       console.log(oldTime);
+      console.log(req.body.t);
+      console.log(project.currStart);
       console.log(timeToAdd);
       project.time = timeToAdd;
       project.started = false;
